@@ -1,0 +1,37 @@
+import discord
+import random
+
+intents = discord.Intents.default()
+intents.members = True  # Enable member intents
+intents.guilds = True
+
+client = discord.Client(intents=intents)
+
+
+@client.event
+async def on_ready():
+    print('We have logged in as {0.user}'.format(client))
+
+
+@client.event
+async def on_message(message):
+
+    if message.author == client.user:
+        return
+
+    if message.content.startswith('!move'):
+        # Get all voice channels
+        voice_channels = [channel for channel in message.guild.channels if channel.type == discord.ChannelType.voice]
+
+        # Get all members in the current voice channel
+        members = message.author.voice.channel.members if message.author.voice else None
+        print(len(members))
+        print(members)
+
+        # Move each member to a random voice channel
+        for member in members:
+            random_channel = random.choice(voice_channels)
+            await member.move_to(random_channel)
+            await message.channel.send(f"Moved member from {member} to {random_channel}")
+
+client.run('Insert Bot Token')
